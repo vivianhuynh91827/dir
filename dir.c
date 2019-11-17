@@ -141,7 +141,7 @@ int main(){
           lsl[(3*i)+3] = 'x';
         }
       }
-      printf("%c%c%c%c%c%c%c%c%c%c %lld %s\n", lsl[0],lsl[1],lsl[2],lsl[3],lsl[4],lsl[5],lsl[6],lsl[7],lsl[8],lsl[9], buff.st_size, cur->d_name);
+      printf("%c%c%c%c%c%c%c%c%c%c %ld %s\n", lsl[0],lsl[1],lsl[2],lsl[3],lsl[4],lsl[5],lsl[6],lsl[7],lsl[8],lsl[9], buff.st_size, cur->d_name);
     }
     cur = readdir(d);
   }
