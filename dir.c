@@ -106,7 +106,7 @@ int main(int argc, char * argv[]){
     return 0;
   }
   int size = 0;
-  printf("Statistics for directory: %s\n", name);
+  printf("\nStatistics for directory: %s\n", name);
   print_dir(d);
   closedir(d);
   d = opendir(name);
