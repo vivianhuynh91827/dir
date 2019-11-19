@@ -53,10 +53,16 @@ char * get_lsl(struct stat info, char* lsl, int type){
   }
   return lsl;
 }
-int main(){
+int main(int argc, char * argv[]){
   printf("=====================================================================\n");
+  if (argc == 1){
+    printf("Please provide a directory\n");
+    return 0;
+  }
+
   DIR * d;
-  char * name = ".";
+  char name[100];
+  strcpy(name, argv[1])
   d = opendir(name);
   if (!d){
     printf("Opening Directory errno: %d\n Error: %s \n",errno, strerror(errno));
@@ -78,7 +84,7 @@ int main(){
 
 
 
-      printf("%s %lld %s\n", ls_l, buff.st_size, cur->d_name);
+      printf("%s %ld %s\n", ls_l, buff.st_size, cur->d_name);
     }
     cur = readdir(d);
   }
@@ -142,6 +148,7 @@ int main(){
         }
       }
       printf("%c%c%c%c%c%c%c%c%c%c %ld %s\n", lsl[0],lsl[1],lsl[2],lsl[3],lsl[4],lsl[5],lsl[6],lsl[7],lsl[8],lsl[9], buff.st_size, cur->d_name);
+      printf("%s %ld %s\n", ls_l, buff.st_size, cur->d_name);
     }
     cur = readdir(d);
   }
