@@ -19,9 +19,8 @@ int print_files(DIR * d){
       struct stat buff;
       int fd = stat(cur->d_name, &buff);
       size += buff.st_size;
-      char lsl[10];
-      get_lsl(buff, lsl, 8);
-      printf("%c%c%c%c%c%c%c%c%c%c %ld %s\n", lsl[0],lsl[1],lsl[2],lsl[3],lsl[4],lsl[5],lsl[6],lsl[7],lsl[8],lsl[9], buff.st_size, cur->d_name);
+      print_lsl(buff, 8);
+      printf(" %ld %s\n", buff.st_size, cur->d_name);
     }
     cur = readdir(d);
   }
@@ -35,56 +34,54 @@ void print_dir(DIR* d){
     if (cur->d_type == 4){
       struct stat buff;
       int fd = stat(cur->d_name, &buff);
-      char ls_l[10] = "";
-      get_lsl(buff, ls_l, 4);
-      printf("%s %ld %s\n", ls_l, buff.st_size, cur->d_name);
+      print_lsl(buff, 4);
+      printf(" %ld %s\n", buff.st_size, cur->d_name);
     }
     cur = readdir(d);
   }
 }
-char * get_lsl(struct stat info, char* lsl, int type){
+void print_lsl(struct stat info, int type){
   int perms = info.st_mode;
   perms = perms % 01000;
   // printf("%o\n", perms);
   int sep[3];
-  sep[0] = perms | 0100;
-  sep[1] = (perms % 0100) | 010;
+  sep[0] = perms / 0100;
+  sep[1] = (perms % 0100) / 010;
   sep[2] = (perms % 010);
-  // printf("%d %d %d\n", sep[0], sep[1], sep[2] );
+  //  printf("%d %d %d\n", sep[0], sep[1], sep[2] );
   if (type == 8){
-    lsl[0] = '-';
+    printf("-");
   }
   if (type == 4){
-    lsl[0] = 'd';
+    printf("d");;
   }
   for (int i = 0; i<3; i ++){
     // printf("%o %s\n", sep[i], lsl);
     if(sep[i] - 4 >= 0){
       sep[i] -= 4;
-      lsl[(3*i)+1] = 'r';
+      printf("r");
     }
     else{
-      lsl[(3*i)+1] = '-';
+      printf("-");;
     }
     // printf("%o %s\n", sep[i], lsl);
     if(sep[i] - 2 >= 0){
       sep[i] -= 2;
-      lsl[(3*i)+2] = 'w';
+      printf("w");
     }
     else{
-      lsl[(3*i)+2] = '-';
+      printf("-");
     }
     // printf("%o %s\n", sep[i], lsl);
     if(sep[i] - 1 >= 0){
       sep[i] -= 1;
-      lsl[(3*i)+3] = 'x';
+      printf("x");
     }
     else{
-      lsl[(3*i)+3] = '-';
+      printf("-");
     }
     // printf("%o %s\n", sep[i], lsl);
   }
-  return lsl;
 }
 int main(int argc, char * argv[]){
   printf("=====================================================================\n");

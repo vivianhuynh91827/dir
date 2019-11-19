@@ -10,5 +10,4 @@
 #include <time.h>
 
 int print_files(DIR * d);
-void print_dir(DIR* d);
-void print_lsl(struct stat info, int type);
+void print_dir(DI get_lsl(struct stat info, char* lsl, int type);
