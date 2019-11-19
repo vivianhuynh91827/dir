@@ -55,17 +55,24 @@ char * get_lsl(struct stat info, char* lsl, int type){
 }
 int main(int argc, char * argv[]){
   printf("=====================================================================\n");
+  char * name;
   if (argc == 1){
-    printf("Please provide a directory\n");
-    return 0;
+    printf("Please provide a directory:\n");
+    char input[500];
+    fgets(input, 500, stdin);
+    input[strlen(input) - 1] = 0;
+    name = input;
   }
-
+  else {
+    char input[500];
+    strcpy(input, argv[1]);
+    name = input;
+  }
   DIR * d;
-  char name[100];
-  strcpy(name, argv[1])
   d = opendir(name);
   if (!d){
     printf("Opening Directory errno: %d\n Error: %s \n",errno, strerror(errno));
+    printf("===================================================================\n");
     return 0;
   }
   int size = 0;
@@ -76,18 +83,13 @@ int main(int argc, char * argv[]){
     if (cur->d_type == 4){
       struct stat buff;
       int fd = stat(cur->d_name, &buff);
-
-
-
-      char ls_l[9] = "";
+      char ls_l[10] = "";
       get_lsl(buff, ls_l, 4);
-
-
-
       printf("%s %ld %s\n", ls_l, buff.st_size, cur->d_name);
     }
     cur = readdir(d);
   }
+  closedir(d);
   d = opendir(name);
   cur = readdir(d);
   printf("\nRegular files:\n");
@@ -97,65 +99,12 @@ int main(int argc, char * argv[]){
       int fd = stat(cur->d_name, &buff);
       size += buff.st_size;
       char lsl[10];
-      int perms = buff.st_mode;
-      perms = perms % 01000;
-      int sep[3];
-      sep[0] = perms / 0100;
-      sep[1] = (perms % 0100) / 010;
-      sep[2] = (perms % 010);
-      // printf("%d %d %d\n", sep[0], sep[1], sep[2] );
-      lsl[0] = '-';
-      for (int i =0; i < 3; i++){
-        if (sep[i] == 00){
-          lsl[(3*i)+1] = '-';
-          lsl[(3*i)+2] = '-';
-          lsl[(3*i)+3] = '-';
-        }
-        else if (sep[i] == 01){
-          lsl[(3*i)+1] = '-';
-          lsl[(3*i)+2] = '-';
-          lsl[(3*i)+3] = 'x';
-        }
-        else if (sep[i] == 02){
-          lsl[(3*i)+1] = '-';
-          lsl[(3*i)+2] = 'w';
-          lsl[(3*i)+3] = '-';
-        }
-        else if (sep[i] == 03){
-          lsl[(3*i)+1] = '-';
-          lsl[(3*i)+2] = 'w';
-          lsl[(3*i)+3] = 'x';
-        }
-        else if (sep[i] == 04){
-          lsl[(3*i)+1] = 'r';
-          lsl[(3*i)+2] = '-';
-          lsl[(3*i)+3] = '-';
-        }
-        else if (sep[i] == 05){
-          lsl[(3*i)+1] = 'r';
-          lsl[(3*i)+2] = '-';
-          lsl[(3*i)+3] = 'x';
-        }
-        else if (sep[i] == 06){
-          lsl[(3*i)+1] = 'r';
-          lsl[(3*i)+2] = 'w';
-          lsl[(3*i)+3] = '-';
-        }
-        else if (sep[i] == 07){
-          lsl[(3*i)+1] = 'r';
-          lsl[(3*i)+2] = 'w';
-          lsl[(3*i)+3] = 'x';
-        }
-      }
-<<<<<<< HEAD
+      get_lsl(buff, lsl, 8);
       printf("%c%c%c%c%c%c%c%c%c%c %ld %s\n", lsl[0],lsl[1],lsl[2],lsl[3],lsl[4],lsl[5],lsl[6],lsl[7],lsl[8],lsl[9], buff.st_size, cur->d_name);
-      printf("%s %ld %s\n", ls_l, buff.st_size, cur->d_name);
-=======
-      printf("%s %ld %s\n", lsl, buff.st_size, cur->d_name);
->>>>>>> b46c431a86cf4205bfa8d57a75b1307afe0e782f
     }
     cur = readdir(d);
   }
+  closedir(d);
   if(size >= 1073741824){printf("Total directory size: %d GB\n", size / 1073741824);}
   else if(size >= 1048576){printf("Total directory size: %d MB\n", size / 1048576);}
   else if(size >= 1024){printf("Total directory size: %d KB\n", size / 1024);}

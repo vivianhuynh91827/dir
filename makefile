@@ -1,5 +1,11 @@
+ifeq ($(DEBUG),true)
+	CC = gcc -g
+else
+	CC = gcc
+endif
+
 dir.o: dir.c
-		gcc -o program dir.c
+	$(CC) -o program dir.c
 
 run:
 	./program
