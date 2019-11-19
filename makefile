@@ -4,7 +4,7 @@ else
 	CC = gcc
 endif
 
-dir.o: dir.c
+dir.o: dir.c dir.h
 	$(CC) -o program dir.c
 
 run:

@@ -8,7 +8,40 @@
 #include <string.h>
 #include <sys/dir.h>
 #include <time.h>
+#include "dir.h"
 
+int print_files(DIR * d){
+  int size = 0;
+  printf("\nRegular files:\n");
+  struct dirent * cur = readdir(d);
+  while (cur){
+    if (cur->d_type == 8){
+      struct stat buff;
+      int fd = stat(cur->d_name, &buff);
+      size += buff.st_size;
+      char lsl[10];
+      get_lsl(buff, lsl, 8);
+      printf("%c%c%c%c%c%c%c%c%c%c %ld %s\n", lsl[0],lsl[1],lsl[2],lsl[3],lsl[4],lsl[5],lsl[6],lsl[7],lsl[8],lsl[9], buff.st_size, cur->d_name);
+    }
+    cur = readdir(d);
+  }
+  return size;
+}
+
+void print_dir(DIR* d){
+  struct dirent * cur = readdir(d);
+  printf("Directories:\n");
+  while(cur){
+    if (cur->d_type == 4){
+      struct stat buff;
+      int fd = stat(cur->d_name, &buff);
+      char ls_l[10] = "";
+      get_lsl(buff, ls_l, 4);
+      printf("%s %ld %s\n", ls_l, buff.st_size, cur->d_name);
+    }
+    cur = readdir(d);
+  }
+}
 char * get_lsl(struct stat info, char* lsl, int type){
   int perms = info.st_mode;
   perms = perms % 01000;
@@ -85,7 +118,7 @@ int main(int argc, char * argv[]){
     printf("===================================================================\n");
     return 0;
   }
-  size = print_files(d)
+  size = print_files(d);
   closedir(d);
   if(size >= 1073741824){printf("Total directory size: %d GB\n", size / 1073741824);}
   else if(size >= 1048576){printf("Total directory size: %d MB\n", size / 1048576);}
@@ -93,37 +126,4 @@ int main(int argc, char * argv[]){
   else{printf("Total directory size: %d B \n", size);}
   printf("=====================================================================\n");
   return 0;
-}
-
-int print_files(DIR * d){
-  int size = 0;
-  printf("\nRegular files:\n");
-  struct dirent * cur = readdir(d);
-  while (cur){
-    if (cur->d_type == 8){
-      struct stat buff;
-      int fd = stat(cur->d_name, &buff);
-      size += buff.st_size;
-      char lsl[10];
-      get_lsl(buff, lsl, 8);
-      printf("%c%c%c%c%c%c%c%c%c%c %ld %s\n", lsl[0],lsl[1],lsl[2],lsl[3],lsl[4],lsl[5],lsl[6],lsl[7],lsl[8],lsl[9], buff.st_size, cur->d_name);
-    }
-    cur = readdir(d);
-  }
-  return size;
-}
-
-void print_dir(DIR* d){
-  struct dirent * cur = readdir(d);
-  printf("Directories:\n");
-  while(cur){
-    if (cur->d_type == 4){
-      struct stat buff;
-      int fd = stat(cur->d_name, &buff);
-      char ls_l[10] = "";
-      get_lsl(buff, ls_l, 4);
-      printf("%s %ld %s\n", ls_l, buff.st_size, cur->d_name);
-    }
-    cur = readdir(d);
-  }
 }
