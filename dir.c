@@ -77,23 +77,29 @@ int main(int argc, char * argv[]){
   }
   int size = 0;
   printf("Statistics for directory: %s\n", name);
-  struct dirent* cur = readdir(d);
-  printf("Directories:\n");
-  while(cur !=NULL){
-    if (cur->d_type == 4){
-      struct stat buff;
-      int fd = stat(cur->d_name, &buff);
-      char ls_l[10] = "";
-      get_lsl(buff, ls_l, 4);
-      printf("%s %ld %s\n", ls_l, buff.st_size, cur->d_name);
-    }
-    cur = readdir(d);
-  }
+  print_dir(d);
   closedir(d);
   d = opendir(name);
-  cur = readdir(d);
+  if (!d){
+    printf("Opening Directory errno: %d\n Error: %s \n",errno, strerror(errno));
+    printf("===================================================================\n");
+    return 0;
+  }
+  size = print_files(d)
+  closedir(d);
+  if(size >= 1073741824){printf("Total directory size: %d GB\n", size / 1073741824);}
+  else if(size >= 1048576){printf("Total directory size: %d MB\n", size / 1048576);}
+  else if(size >= 1024){printf("Total directory size: %d KB\n", size / 1024);}
+  else{printf("Total directory size: %d B \n", size);}
+  printf("=====================================================================\n");
+  return 0;
+}
+
+int print_files(DIR * d){
+  int size = 0;
   printf("\nRegular files:\n");
-  while (cur != NULL){
+  struct dirent * cur = readdir(d);
+  while (cur){
     if (cur->d_type == 8){
       struct stat buff;
       int fd = stat(cur->d_name, &buff);
@@ -104,11 +110,20 @@ int main(int argc, char * argv[]){
     }
     cur = readdir(d);
   }
-  closedir(d);
-  if(size >= 1073741824){printf("Total directory size: %d GB\n", size / 1073741824);}
-  else if(size >= 1048576){printf("Total directory size: %d MB\n", size / 1048576);}
-  else if(size >= 1024){printf("Total directory size: %d KB\n", size / 1024);}
-  else{printf("Total directory size: %d B \n", size);}
-  printf("=====================================================================\n");
-  return 0;
+  return size;
+}
+
+void print_dir(DIR* d){
+  struct dirent * cur = readdir(d);
+  printf("Directories:\n");
+  while(cur){
+    if (cur->d_type == 4){
+      struct stat buff;
+      int fd = stat(cur->d_name, &buff);
+      char ls_l[10] = "";
+      get_lsl(buff, ls_l, 4);
+      printf("%s %ld %s\n", ls_l, buff.st_size, cur->d_name);
+    }
+    cur = readdir(d);
+  }
 }
